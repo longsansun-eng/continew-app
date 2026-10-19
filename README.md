@@ -15,7 +15,7 @@ ContiNew App 是 OpenContiNew 社区的多端工程脚手架，目标平台为 *
 它的差异化不在组件，而在**工程治理与 AI 协作**：
 
 - **AI 工程化闭环**：`AGENTS.md` 单一事实源 + 提交前真门禁（lint / typecheck / build），让 AI 写出的代码必须通过机器检查，而不只是文档约束
-- **Java 后端友好**：内置独立演示后端（Hono + Zod），统一返回体形状，后续提供 ContiNew Admin 等 Java 后端的对接适配器
+- **Java 后端友好**：消费者后端使用相邻 continew-admin/continew-app-server 独立 Java 服务，前端保留通用请求适配器
 - **预封装业务组件**：`Cm*` 薄壳组件 + 组合式函数（请求层 / 会话管理 / 列表三态 / 确认反馈），AI 只能装配不能重写
 - **现代技术栈**：uni-app（Vue 3 + Vite + TS strict）+ wot-design-uni + UnoCSS（Tailwind 语法 + wot-\* 设计令牌）+ pnpm catalog 集中版本管理
 
@@ -27,7 +27,7 @@ ContiNew App 是 OpenContiNew 社区的多端工程脚手架，目标平台为 *
 | UI 组件库 | wot-design-uni（Cm* 薄壳封装） |
 | 原子化 CSS | UnoCSS（presetWind4 + presetWot + presetApplet） |
 | 状态管理 | Pinia |
-| 演示后端 | Hono + Zod（独立发展，不依赖 ContiNew Admin） |
+| 消费者后端 | continew-admin/continew-app-server，Java独立服务 |
 | 包管理 | pnpm 12（workspace + catalog 集中版本） |
 | 质量门禁 | ESLint（@antfu/eslint-config）+ vue-tsc + 三端构建 |
 
@@ -46,11 +46,11 @@ ContiNew App 是 OpenContiNew 社区的多端工程脚手架，目标平台为 *
 # 安装依赖
 pnpm install
 
-# 启动演示应用（H5，默认端口 5173，/api 代理到 8080）
+# 启动演示应用（H5，默认端口 5173，仅展示组件与主题）
 pnpm dev:demo
 
-# 启动演示后端（默认端口 8080）
-pnpm dev:server
+# 启动正式消费者H5（默认端口5180，Java服务独立运行）
+pnpm dev:consumer
 
 # 微信小程序（编译后导入微信开发者工具）
 pnpm dev:mp-weixin
@@ -95,7 +95,6 @@ continew-app/
 ├── packages/
 │   ├── core/                 # 核心运行时：请求层 / 会话管理 / 组合式函数
 │   ├── ui/                   # Cm* 薄壳组件（基于 wot-design-uni）
-│   ├── server/               # 独立演示后端（Hono + Zod）
 │   └── eslint-config/        # 统一 ESLint 配置（含红线规则）
 └── tools/                    # 工程化工具（review-lint 红线扫描器）
 ```
@@ -133,3 +132,13 @@ continew-app/
 ## License
 
 [Apache-2.0](LICENSE) © 2026-present Charles7c Authors
+
+## 消费者基础平台运行
+
+1. 按 `apps/consumer/.env.example` 配置应用编码、后端地址、承载H5编码和HTTPS地址；不得在前端放密钥。
+2. 先由管理端安装消费者基础数据变更，配置真实租户、应用、授权、有效入口及品牌发布版本。
+3. 启动 Java app 服务后运行 `pnpm dev:consumer`；微信小程序壳运行 `pnpm dev:consumer:mp`。
+4. 小程序使用共享H5，只在原生层办理入口、短信登录及一次性票据交换。本期无消费者预约、支付入口。
+5. 独立后端配置、API及生产验证步骤见 admin 官方文档中的“消费者基础平台接入”。
+
+Node.js仍用于前端构建、检查和测试；Hono、模拟账号密码及演示微信登录已经移除。组件demo不连接业务后端。

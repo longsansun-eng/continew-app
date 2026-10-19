@@ -10,6 +10,8 @@
 
 ## 数据获取
 
+当前demo只展示组件与主题，不提供登录、演示CRUD或后端数据；下列数据组织规范用于正式消费者应用扩展，不恢复已删除的演示服务。
+
 - **API 模块**：`src/api/` 按资源建文件（如 `demo.ts`），统一从 `./http` 导入 `http` 请求器；页面不直接 import `@continew-app/core` 的请求方法。
 - **列表页**：用 `useList()`（来自 `@continew-app/core`）+ `<CmPage>` 组织「加载 / 错误 / 空」三态，缺一不可；`fetcher` 内调用 `api/` 模块的函数，不写演示数据。
 - **详情页**：用 `pickRouteParam('id')` 取路由参数，`safeBack('/pages/<父级>/index')` 兜底返回，**不裸调 `uni.navigateBack`**。

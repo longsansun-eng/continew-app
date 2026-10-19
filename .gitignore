@@ -22,7 +22,7 @@ build/Release
 unpackage/
 
 # uni-app 自动生成产物（由 manifest.config.ts 生成，勿提交；appid 等真实值走 .env）
-apps/demo/src/manifest.json
+apps/*/src/manifest.json
 
 # Cache
 *.tsbuildinfo

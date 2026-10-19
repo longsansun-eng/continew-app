@@ -19,7 +19,7 @@
 
 ContiNew App 是 OpenContiNew 社区的多端工程脚手架，目标平台 **App（Android/iOS）、微信小程序、H5、桌面端（Tauri，规划中）** 多端一套代码。差异化定位在工程治理与 AI 协作，而非组件库本身。
 
-**技术栈**：uni-app（Vue 3.5 + Vite 5 + TypeScript strict）+ wot-design-uni + UnoCSS + Pinia + Hono（演示后端）
+**技术栈**：uni-app（Vue 3.5 + Vite 5 + TypeScript strict）+ wot-design-uni + UnoCSS + Pinia
 
 **当前版本**：0.1.0 | **主分支**：`dev` | **Node**：22+ | **包管理**：pnpm 12（`packageManager` 字段锁定，`corepack enable` 启用，勿用 npm/yarn）
 
@@ -40,11 +40,11 @@ ContiNew App 是 OpenContiNew 社区的多端工程脚手架，目标平台 **Ap
 
 ```
 apps/
-  demo/                    # 演示应用（App / 微信小程序 / H5）
+  demo/                    # 纯组件和主题示例
+  consumer/                # 正式消费者H5和微信小程序壳
 packages/
   core/                    # 核心运行时：请求层 / 会话管理 / 组合式函数
   ui/                      # Cm* 薄壳组件（基于 wot-design-uni）
-  server/                  # 独立演示后端（Hono + Zod）
   eslint-config/           # 统一 ESLint 配置（@antfu/eslint-config 二次定制）
 tools/                     # 工程化工具（review-lint 红线扫描器）
 ```
@@ -55,7 +55,6 @@ tools/                     # 工程化工具（review-lint 红线扫描器）
 |:---|:-----|:-----|
 | `@continew-app/core` | 请求层 / 会话管理 / 组合式函数 | 无 UI 依赖，可在任何 uni-app 项目中使用 |
 | `@continew-app/ui` | Cm* 薄壳组件 | 只封装 wot-design-uni，不依赖 core，不引入第二家组件库 |
-| `@continew-app/server` | 独立演示后端 | 不依赖 ContiNew Admin，独立发展；与 core 共享返回体形状 |
 | `@continew-app/eslint-config` | 统一 ESLint 配置 | 唯一事实源，内置红线规则（no-restricted-*），各包不单独维护 .eslintrc |
 | `@continew-app/demo` | 演示应用 | **AI 的唯一规范载体**：新增页面/组件照它的结构写 |
 
@@ -66,7 +65,7 @@ tools/                     # 工程化工具（review-lint 红线扫描器）
 - **统一请求层**：`@continew-app/core` 的 `createRequestor()` 返回 `{ get, post, put, patch, del, request }`，内置 token 注入、业务错误归一化（`ApiError`）、错误 toast、401 恢复钩子（`onUnauthorized`）。页面与 composable 一律经它发请求，**不裸调 `uni.request`**。
 - **会话管理**：`createSessionRefresher()` 提供单飞刷新令牌（并发 401 只刷新一次）；`clearSession()` 统一登出；`safeBack()` 兜底返回（H5 刷新 delta=0 时 `uni.navigateBack` 失效）。**不裸调 `uni.navigateBack`**。
 - **列表三态**：`useList()` + `<CmPage>` 组件强制「加载 / 错误 / 空」三态，缺一不可。
-- **统一返回体**：`packages/server` 与 `@continew-app/core` 共享 `{ error: { code, message, details? } }` 错误形状；HTTP 语义约定：`400` 入参非法（`invalid_input`）、`401` 会话失效、`404` 资源不存在、`409` 状态冲突。
+- **统一返回体**：Java消费者后端与 `@continew-app/core` 共享 `{ error: { code, message, details? } }` 错误形状；HTTP 语义约定：`400` 入参非法（`invalid_input`）、`401` 会话失效、`404` 资源不存在、`409` 状态冲突。
 - **Cm* 薄壳组件**：`@continew-app/ui` 提供 `<CmPage>` `<CmEmpty>` 等薄壳，内部包装 `wd-*`。业务页面优先使用 Cm*，确需 wd-* 时直接使用，但**不写 `:deep()` 穿透组件内部样式**（应提 Issue 到组件库或提 PR 扩展 Cm*）。
 - **原子类**：模板优先使用 Tailwind 语法原子类（`px-4` `text-sm` `flex` 等，AI 语料最丰富）；需要品牌语义色时用 `wot-*` 令牌类；**不手写大量 scoped SCSS**。
 - **设计令牌三层结构（值 / 名 / 主题分离）**：
@@ -83,11 +82,11 @@ tools/                     # 工程化工具（review-lint 红线扫描器）
 # 安装依赖（首次）
 pnpm install
 
-# 演示应用（H5，默认端口 5173，/api 代理到 8080）
+# 演示应用（H5，默认端口 5173，仅展示组件与主题）
 pnpm dev:demo
 
-# 演示后端（默认端口 8080）
-pnpm dev:server
+# 正式消费者H5（独立Java服务默认8080）
+pnpm dev:consumer
 
 # 微信小程序（编译后导入微信开发者工具）
 pnpm dev:mp-weixin
@@ -108,7 +107,7 @@ pnpm lint:redline
 # 单元测试（Vitest）
 pnpm test
 
-# 三端生产构建（server + H5 + 微信小程序）
+# 三端生产构建（组件示例与消费者 H5、微信小程序）
 pnpm build
 
 # 完整门禁（lint + lint:redline + typecheck + build）
@@ -125,7 +124,7 @@ pnpm verify:quick
 1. `pnpm lint`——ESLint 代码规范检查（含红线规则）；
 2. `pnpm lint:redline`——review-lint 红线扫描（依赖版本、第二家 UI 库、裸调 uni.request、scoped 样式行数）；
 3. `pnpm typecheck`——vue-tsc / tsc 全量类型检查；
-4. `pnpm build`——三端生产构建（server + H5 + 微信小程序，验证可构建性）。
+4. `pnpm build`——三端生产构建（组件示例与消费者 H5、微信小程序，验证可构建性）。
 
 被 lint 拦截时执行 `pnpm lint:fix` 自动修复，再重跑 `pnpm lint` 确认。全部门禁通过后才能提交。紧急跳过用 `git commit --no-verify`，事后必须补跑。
 
@@ -153,7 +152,7 @@ pnpm verify:quick
 - **新增一个演示页面**：在 `apps/demo/src/pages/<name>/index.vue` 创建，注册到 `pages.json`，使用 `<CmPage>` 组织三态；如涉及新 API，先在 `apps/demo/src/api/` 建立对应模块。
 - **新增一个 Cm* 组件**：在 `packages/ui/src/components/cm-<name>/Cm<Name>.vue` 创建，导出到 `packages/ui/src/index.ts`；只包装 `wd-*`，不依赖 core，不引入其他组件库。
 - **新增一个组合式函数**：在 `packages/core/src/composables/use-<name>.ts` 创建，导出到 `packages/core/src/index.ts`；保持无 UI 依赖。
-- **新增一个后端接口**：在 `packages/server/src/routes/` 建立路由文件，挂载到 `src/app.ts`；入参走 Zod 校验，错误返回统一 `apiError(code, message, details?)` 形状。
+- **新增一个后端接口**：在相邻admin工程的独立Java消费者服务实现，公共契约放common；前端只在统一请求适配器处理响应。
 - **升级依赖**：先开 Issue 讨论（说明用途、体积、维护活跃度），通过后只改 `pnpm-workspace.yaml` 的 `catalog`，各包自动生效。
 
 ## 已知约束与取舍
@@ -172,3 +171,10 @@ pnpm verify:quick
   4. **CSS 自定义属性按「替换完成后的计算值」继承**：指向 wot 变量的语义 token（如 `--cm-bg-page: var(--wot-filled-bottom)`）若只在亮色块声明，var() 会在亮色作用域就替换冻结，暗色翻转 wot 变量也救不回——**凡引用 `var(--wot-*)` 的 `--cm-*` 必须在 `.wot-theme-dark` 重新声明**，review-lint 已机器拦截。
 - **UnoCSS 单位策略**：统一用固定 px（`px-4` = 16px），不用 rem/rpx。`presetRemToPx` 把 wind 工具类的 rem 转成 px，避免 uni-h5 根字号缩放（`width/23.4375`）导致布局失真。三端一致，不随屏幕宽度缩放。
 - **`src/manifest.json` 是生成产物，改配置须动 `apps/demo/manifest.config.ts`**：它由 unh 的 `autoGenerate.manifest` 在 dev/build 时前置生成（已 gitignore）。**直接改 `src/manifest.json` 会在下次构建被无声覆盖，且改动不进版本库**——这是 uni-app 生态最常踩的坑（manifest.json 本是著名配置文件）。appid 走 `apps/demo/.env`（`VITE_UNI_APPID`/`VITE_WX_APPID`）。不能改用 vite 插件路线：`@uni-helper/vite-plugin-uni-manifest` 注册为 vite 插件时生成时机晚于 uni 读取 manifest.json，但**该包必须保留**（unh 通过 `isPackageExists` 检测它来启用生成）。
+
+## 消费者基础平台
+
+- 后端在相邻 `continew-admin/continew-app-server`，独立启动。仓库不再运行Node.js后端。
+- `apps/consumer` 仅实现商户识别、短信登录、品牌、本人资料、联系人和H5承载；预约、支付按后续独立业务模块接入。
+- 消费者会话不使用demo或员工令牌；H5使用标签页会话存储，小程序与H5通过短时一次性票据交换。
+- `apps/demo` 只保留离线组件和主题展示，禁止添加模拟登录、伪成功接口或演示业务持久化。

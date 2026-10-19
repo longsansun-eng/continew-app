@@ -26,7 +26,8 @@ watchEffect(() => {
     backgroundColor: dark ? '#1d1f29' : '#ffffff',
     fail: () => {},
   })
-  uni.setBackgroundColor({ backgroundColor: dark ? '#1d1f29' : '#f7f8fa' })
+  if (typeof uni.setBackgroundColor === 'function')
+    uni.setBackgroundColor({ backgroundColor: dark ? '#1d1f29' : '#f7f8fa' })
 })
 </script>
 

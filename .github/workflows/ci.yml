@@ -51,5 +51,5 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Build（server + H5 + 微信小程序）
+      - name: Build（组件示例与消费者 H5、小程序壳）
         run: pnpm build

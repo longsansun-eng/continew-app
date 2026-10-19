@@ -1,6 +1,6 @@
 import type { CmApiErrorBody } from '../http/types'
 
-/** 业务错误码约定：与 packages/server 的返回体对齐 */
+/** 业务错误码约定：与 Java 消费者服务的错误体对齐 */
 export const API_ERROR_CODES = [
   'invalid_input',
   'unauthorized',

@@ -1,4 +1,4 @@
-/** 服务端统一返回体形状（与 packages/server 对齐） */
+/** 服务端统一返回体形状（与 Java 消费者服务对齐） */
 export interface CmApiErrorBody {
   error: {
     code: string

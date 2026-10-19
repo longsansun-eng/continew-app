@@ -1,0 +1,35 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^wd-(.*)": "@wot-ui/ui/components/wd-$1/wd-$1.vue"
+    }
+  },
+  "pages": [
+    // #ifdef MP-WEIXIN
+    {
+      "path": "pages/shell/index",
+      "style": { "navigationBarTitleText": "商户服务", "enableShareAppMessage": true }
+    },
+    // #endif
+    // #ifdef H5
+    {
+      "path": "pages/home/index",
+      "style": { "navigationBarTitleText": "商户服务" }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": { "navigationBarTitleText": "我的资料" }
+    },
+    {
+      "path": "pages/contacts/index",
+      "style": { "navigationBarTitleText": "常用联系人" }
+    },
+    // #endif
+    {
+      "path": "pages/login/index",
+      "style": { "navigationBarTitleText": "手机号登录" }
+    }
+  ],
+  "globalStyle": { "navigationBarTitleText": "商户服务", "darkmode": true }
+}

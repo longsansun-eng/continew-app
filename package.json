@@ -14,9 +14,7 @@
     "dev:h5": "pnpm --filter @continew-app/demo dev:h5",
     "dev:mp-weixin": "pnpm --filter @continew-app/demo dev:mp-weixin",
     "dev:app": "pnpm --filter @continew-app/demo dev:app",
-    "dev:server": "pnpm --filter @continew-app/server dev",
-    "build": "pnpm build:server && pnpm build:h5 && pnpm build:mp-weixin",
-    "build:server": "pnpm --filter @continew-app/server build",
+    "build": "pnpm build:h5 && pnpm build:mp-weixin && pnpm --filter @continew-app/consumer build:h5 && pnpm --filter @continew-app/consumer build:mp-weixin",
     "build:h5": "pnpm --filter @continew-app/demo build:h5",
     "build:mp-weixin": "pnpm --filter @continew-app/demo build:mp-weixin",
     "build:app": "pnpm --filter @continew-app/demo build:app",
@@ -27,7 +25,9 @@
     "test": "pnpm -r test",
     "verify": "pnpm lint && pnpm lint:redline && pnpm typecheck && pnpm build",
     "verify:quick": "pnpm lint && pnpm lint:redline && pnpm typecheck",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:consumer": "pnpm --filter @continew-app/consumer dev:h5",
+    "dev:consumer:mp": "pnpm --filter @continew-app/consumer dev:mp-weixin"
   },
   "devDependencies": {
     "@continew-app/eslint-config": "workspace:*",
